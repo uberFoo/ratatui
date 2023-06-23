@@ -115,6 +115,25 @@ impl<'a> From<Spans<'a>> for Line<'a> {
     }
 }
 
+impl<'a> IntoIterator for Line<'a> {
+    type Item = Span<'a>;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.spans.into_iter()
+    }
+}
+
+impl<'a, T> Extend<T> for Line<'a>
+where
+    T: Into<Span<'a>>,
+{
+    fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I) {
+        let spans = iter.into_iter().map(|s| s.into());
+        self.spans.extend(spans);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::style::{Color, Modifier, Style};
